@@ -53,7 +53,7 @@ def text_handler(message):
 def handle_sticker(message):
     pass
 def prediction(message,text):
-    bot.send_message(message.chat.id, config.get_message)
+    #bot.send_message(message.chat.id, config.get_message)
     ind,theme_name = robo_bitch.predict(text.lower())
     bot.send_message(message.chat.id, config.prediction_message % theme_name)
     start_waiting_answer_from_user(message.chat.id)
