@@ -3,6 +3,8 @@ import config
 import re
 import random
 
+print('bot started')
+
 secure_random = random.SystemRandom()
 remove_whitespace = re.compile('/^\s*([\S\s]*?)\s*$/')
 
