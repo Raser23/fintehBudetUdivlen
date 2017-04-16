@@ -86,8 +86,8 @@ def solo_answer(message_text,user_id):
             pass
     waiting_answer_from_user[user_id].waiting_response = False
 unright_choosed_streak = {}
-def form_list(predictions):
-    text = config.multy_predict_message
+def form_list(predictions,start_text = config.multy_predict_message):
+    text = start_text
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     for p in predictions:
         text += '\n' + str(p[0]) + '-' + str(p[1])
@@ -108,9 +108,9 @@ def multy_answer(message_text,user_id):
             unright_choosed_streak.setdefault(user_id,0)
             unright_choosed_streak[user_id]+=1
             if(unright_choosed_streak[user_id] < 3):
-                text, markup = form_list(waiting_answer_from_user[user_id].sended_theme)
+                text, markup = form_list(waiting_answer_from_user[user_id].sended_theme,start_text=config.more_point_text)
                 keyboard_choose_notifications[user_id] = models.motification(user_id,text,config.first_notify_time,markup)
-                bot.send_message(user_id,text,markup)
+                bot.send_message(user_id,'Номер темы был казан неправильно.\n'+text,markup)
             else:
                 bot.send_message(user_id,config.restart_message,reply_markup=types.ReplyKeyboardRemove())
                 unright_choosed_streak[user_id] = 0
@@ -150,7 +150,7 @@ def prediction(message,text):
         bot.send_message(message.chat.id, config.prediction_message % predictions[0][1],reply_markup=markup)
         start_waiting_answer_from_user(message.chat.id, int(predictions[0][0]))
     else:
-        text,markup = form_list(predictions)
+        text,markup = form_list(predictions,start_text=config.more_point_text)
         bot.send_message(message.chat.id,text,reply_markup=markup)
         start_waiting_answer_from_user(user_id,predictions)
         keyboard_choose_notifications[user_id] = models.motification(user_id, text, config.first_notify_time, markup)
