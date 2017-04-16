@@ -60,4 +60,4 @@ def predict(text):
     for i in range(3):
         if (max_value[i+1] > 0.07):
             a.append((max_num[i+1], table['theme'][max_num[i+1]]))
-    return a[0]
+    return a

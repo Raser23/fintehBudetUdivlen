@@ -1,5 +1,5 @@
 import time
-
+from telebot import types
 class waitAns:
     def __init__(self, user_id, wait_resp,theme_id):
         self.start_wait_time = time.time()
@@ -10,10 +10,11 @@ class waitAns:
         self.sended_theme = theme_id
 
 class motification:
-    def __init__(self,id,text,wait_time):
+    def __init__(self,id,text,wait_time,markup = types.ReplyKeyboardRemove() ):
         self.user_id = id
         self.text = text
         self.time = wait_time
         self.start_wait_time = time.time()
         self.first_notify = False
         self.second_notify = False
+        self.reply_markup = markup

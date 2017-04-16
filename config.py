@@ -9,6 +9,7 @@ get_message = 'Ваше сообщение отправлено на обраб�
 unimportant_messages = ['да','нет','привет']
 stickers_id = ['CAADAwADTgYAAmFKuQABl6fOzoLfppQC','CAADAwADUgYAAmFKuQABdV1GwOfhYF4C','CAADAwADqwYAAmFKuQABs7tYYEdF8_oC','CAADAwADnQYAAmFKuQABJs_HCy9dQX8C']
 emotes = ['😂','😁','😆','😂','😆','😁','😄']
+positive_phrases = ['Удачного дня!']
 prediction_message = 'Вас интересует \"%s\". Да?'
 
 positive_answers = ['да', "конечно","ага","угадал","точно","верно"]
@@ -23,3 +24,5 @@ unpoint_prediction = 'Не смогли определить тему вашег
 first_notify = 'Мне нужен ваш ответ. Напишите "да" или "нет".'
 first_notify_time = 30
 stop_notife_time = 210
+multy_predict_message = 'Пожалуйста, уточните, какая тема вас интересует:'
+no_one = 'Никакая из предложенных'
