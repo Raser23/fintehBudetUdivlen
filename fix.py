@@ -4,15 +4,14 @@ import numpy as np
 import pymorphy2
 from nltk.corpus import stopwords
 from pandas import read_csv
-
+#nltk.download()
 morph = pymorphy2.MorphAnalyzer()
 
 
 def tokenize_me(file_text):
     #deleting stop_words
-    stop_words = stopwords.words('russian')
-    #print(stop_words)
-    stop_words.extend(['что', 'это', 'так', 'вот', 'быть', 'как', 'в', '—', 'к', 'на', 'хочу'])
+    #stop_words = stopwords.words('russian')
+    stop_words=[]
     tokens = [t for t in file_text.split(' ') if t!= '' and t!=' ' and t not in stop_words]
     new_tok = []
     for i in tokens:
