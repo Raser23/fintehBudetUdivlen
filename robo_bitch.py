@@ -1,6 +1,6 @@
 from pandas import read_csv
 import numpy as np
-import fix
+#import fix
 from sklearn.externals import joblib
 import re
 
@@ -14,8 +14,7 @@ def predict(text):
     text = re.sub(r,' ',text)
     while '  ' in text:
         text= text.replace('  ',' ')
-    tokens = fix.tokenize_me(text)
-    '''
+    #tokens = fix.tokenize_me(text)'''
     tokens = text.split(' ');
     for i in range(len(tokens) - 1):
         if (tokens[i + 1][0:4] == 'карт'):
@@ -27,7 +26,7 @@ def predict(text):
                 if (tokens[i + 1][0:4] == 'карт'):
                     tokens[i] = ''
                     tokens[i + 1] = 'кредитка'
-    '''
+    #'''
     text = ' '.join(tokens)
     pred = clf.predict_proba([text])
     max_value = [0, 0, 0, 0]
@@ -56,8 +55,19 @@ def predict(text):
                 max_value[3] = pred[0][i]
                 max_num[3] = i
     prediction = clf.predict([text])[0]
-    a = [(prediction, table['theme'][prediction])]
+    a = []
     for i in range(3):
-        if (max_value[i+1] > 0.07):
-            a.append((max_num[i+1], table['theme'][max_num[i+1]]))
+        if (max_value[i] > 0.225):
+            a.append((max_num[i], table['theme'][max_num[i]]))
     return a
+
+def predict_csv(csv_path):
+    texts = read_csv(csv_path, sep = ',',encoding='utf-8')
+    a = str(csv_path)[0:-4] + 'output.csv'
+    f = open(a, 'w', encoding='utf-8')
+    f.write('Index,ThemeLabel\n')
+    for i in range(texts['Index'].size):
+        #print(predict(texts['Speech'][i])[0][0])
+        f.write(str(texts['Index'][i]) + ',' + str(predict(texts['Speech'][i])[0][0]) + '\n')
+    return a
+

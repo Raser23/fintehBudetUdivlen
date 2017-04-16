@@ -6,9 +6,15 @@ import models
 import time
 import robo_bitch
 import point_callbacks
+import urllib3
 from telebot import types
 from utils import delay
 import utils
+import json
+import shutil
+import urllib.request
+http = urllib3.PoolManager()
+
 stored_messages = {}
 unright_detect = {}
 @delay(0.01)
@@ -27,6 +33,29 @@ secure_random = random.SystemRandom()
 remove_whitespace = re.compile('/^\s*([\S\s]*?)\s*$/')
 bot = telebot.TeleBot(config.token)
 
+
+@bot.message_handler(content_types=["document"] )
+def text_handler(message):
+    try:
+        document_id = message.document.file_id
+        url = 'https://api.telegram.org/bot{}/getFile?file_id={}'.format( config.token,str(document_id))
+        r = http.request('GET', url)
+        all = json.loads(r.data,encoding='utf-8')
+        result = all['result']
+        url1 = 'https://api.telegram.org/file/bot{}/{}'.format(config.token,result['file_path'])
+        if(result['file_path'].split('.')[-1] !='csv'):
+            return
+        file_name =str(message.chat.id )+ result['file_path'].split('/')[-1]
+
+        with http.request('GET', url1, preload_content=False) as resp, open(file_name, 'wb') as out_file:
+            shutil.copyfileobj(resp, out_file)
+        result_name = robo_bitch.predict_csv('./'+file_name)
+        print(result_name)
+        with open(result_name,'r',encoding='utf-8') as f:
+            bot.send_document(message.chat.id, f, None)
+    except:
+        bot.send_message(message.chat.id,'Some trouble')
+
 def message_sender(id,markup):
     def the_wrapper(text):
         if(markup):
@@ -34,6 +63,7 @@ def message_sender(id,markup):
         else:
             send_message(id, text)
     return the_wrapper
+
 @bot.message_handler(commands = ['start'])
 def start(message):
     bot.send_message(message.chat.id,config.start_message)
@@ -110,6 +140,7 @@ def multy_answer(message_text,user_id):
             if(unright_choosed_streak[user_id] < 3):
                 text, markup = form_list(waiting_answer_from_user[user_id].sended_theme,start_text=config.more_point_text)
                 keyboard_choose_notifications[user_id] = models.motification(user_id,text,config.first_notify_time,markup)
+                text, markup = form_list(waiting_answer_from_user[user_id].sended_theme)
                 bot.send_message(user_id,'Номер темы был казан неправильно.\n'+text,markup)
             else:
                 bot.send_message(user_id,config.restart_message,reply_markup=types.ReplyKeyboardRemove())
@@ -143,18 +174,25 @@ def prediction(message,text):
     analyze_text = text
     if (error_streak > 0):
         analyze_text = stored_messages[user_id][-2]+' ' + analyze_text
-    print(analyze_text)
+    if (error_streak > 1):
+        analyze_text = stored_messages[user_id][-3] + ' ' + analyze_text
+
+    #print(analyze_text)
     predictions = robo_bitch.predict(analyze_text.lower())
-    if(len( predictions) == 1):
-        markup = utils.generate_markup('да', 'нет')
-        bot.send_message(message.chat.id, config.prediction_message % predictions[0][1],reply_markup=markup)
-        start_waiting_answer_from_user(message.chat.id, int(predictions[0][0]))
+    if(len(predictions) == 0):
+        reaction_on_unimp_messages(message)
     else:
-        text,markup = form_list(predictions,start_text=config.more_point_text)
-        bot.send_message(message.chat.id,text,reply_markup=markup)
-        start_waiting_answer_from_user(user_id,predictions)
-        keyboard_choose_notifications[user_id] = models.motification(user_id, text, config.first_notify_time, markup)
-        pass
+        if(len( predictions) == 1):
+            markup = utils.generate_markup('да', 'нет')
+            bot.send_message(message.chat.id, config.prediction_message % predictions[0][1],reply_markup=markup)
+            start_waiting_answer_from_user(message.chat.id, int(predictions[0][0]))
+        else:
+            text,markup = form_list(predictions)
+            bot.send_message(message.chat.id,text,reply_markup=markup)
+            start_waiting_answer_from_user(user_id,predictions)
+            text, markup = form_list(predictions, start_text=config.more_point_text)
+            keyboard_choose_notifications[user_id] = models.motification(user_id, text, config.first_notify_time, markup)
+            pass
 
 def start_waiting_answer_from_user(id,theme_id):
     waiting_answer_from_user[id] = models.waitAns(id , True,theme_id)
