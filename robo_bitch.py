@@ -6,7 +6,7 @@ import re
 import fix
 r = re.compile('[^а-яА-Я]')
 
-clf = joblib.load('mega_faggot5.pkl')
+clf = joblib.load('mega_faggot2.pkl')
 table = read_csv('1.csv')
 
 def predict(text):
