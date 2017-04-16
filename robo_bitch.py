@@ -3,18 +3,21 @@ import numpy as np
 #import fix
 from sklearn.externals import joblib
 import re
-
+import fix
 r = re.compile('[^а-яА-Я]')
 
-clf = joblib.load('mega_faggot5.pkl')
+clf = joblib.load('Tengen_Toppa_mega_faggot.pkl')
 table = read_csv('1.csv')
 
 def predict(text):
+    if(text == 'инн'):
+        return [(32,'Реквизиты банка')]
     text = text.lower()
     text = re.sub(r,' ',text)
     while '  ' in text:
         text= text.replace('  ',' ')
-    #tokens = fix.tokenize_me(text)'''
+    tokens = fix.tokenize_me(text)
+    '''
     tokens = text.split(' ');
     for i in range(len(tokens) - 1):
         if (tokens[i + 1][0:4] == 'карт'):
@@ -26,7 +29,7 @@ def predict(text):
                 if (tokens[i + 1][0:4] == 'карт'):
                     tokens[i] = ''
                     tokens[i + 1] = 'кредитка'
-    #'''
+    '''
     text = ' '.join(tokens)
     pred = clf.predict_proba([text])
     max_value = [0, 0, 0, 0]
